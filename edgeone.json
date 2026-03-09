@@ -1,0 +1,10 @@
+{
+  "outputDirectory": ".edgeone",
+  "redirects": [
+      {
+        "source": "/articles/:id",
+        "destination": "/news-articles/:id",
+        "statusCode": 301
+      }
+    ]
+}
