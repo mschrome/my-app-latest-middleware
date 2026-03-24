@@ -2,6 +2,11 @@
   "outputDirectory": ".edgeone",
   "redirects": [
       {
+        "source": "/demo-go-framework",
+        "destination": "/demo-go-framework/",
+        "statusCode": 301
+      },
+      {
         "source": "/articles/:id",
         "destination": "/news-articles/:id",
         "statusCode": 301
