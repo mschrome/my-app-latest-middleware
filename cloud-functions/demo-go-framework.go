@@ -168,6 +168,35 @@ func main() {
 		})
 	})
 
+	// 超时测试 - 用于验证 maxDuration 配置
+	// 访问 /sleep?seconds=25 可以正常返回（Go maxDuration=30）
+	// 访问 /sleep?seconds=35 应该被强制终止（超过30秒限制）
+	r.GET("/sleep", func(c *gin.Context) {
+		seconds := 5
+		if s := c.Query("seconds"); s != "" {
+			if parsed, err := strconv.Atoi(s); err == nil && parsed > 0 && parsed <= 120 {
+				seconds = parsed
+			}
+		}
+		c.Writer.Header().Set("Content-Type", "application/json")
+		c.Writer.WriteHeader(http.StatusOK)
+		c.Writer.Flush()
+
+		startTime := time.Now()
+		fmt.Printf("[SLEEP] Starting sleep for %d seconds...\n", seconds)
+		time.Sleep(time.Duration(seconds) * time.Second)
+		elapsed := time.Since(startTime).Seconds()
+		fmt.Printf("[SLEEP] Woke up after %.2f seconds\n", elapsed)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message":          fmt.Sprintf("Slept for %d seconds", seconds),
+			"requested_sleep":  seconds,
+			"actual_elapsed":   fmt.Sprintf("%.2fs", elapsed),
+			"max_duration":     "30s (configured in edgeone.json)",
+			"within_limit":     seconds <= 30,
+		})
+	})
+
 	// 错误处理测试
 	r.GET("/error", func(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{

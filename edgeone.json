@@ -1,15 +1,13 @@
 {
-  "outputDirectory": ".edgeone",
-  "redirects": [
-      {
-        "source": "/demo-go-framework",
-        "destination": "/demo-go-framework/",
-        "statusCode": 301
-      },
-      {
-        "source": "/articles/:id",
-        "destination": "/news-articles/:id",
-        "statusCode": 301
-      }
-    ]
+  "cloudFunctions": {
+    "nodejs": {
+      "maxDuration": 10
+    },
+    "python": {
+      "maxDuration": 20
+    },
+    "go": {
+      "maxDuration": 30
+    }
+  }
 }
