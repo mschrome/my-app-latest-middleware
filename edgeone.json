@@ -9,17 +9,5 @@
     "go": {
       "maxDuration": 30
     }
-  },
-  "redirects": [
-    {
-      "source": "/demo-go-framework",
-      "destination": "/demo-go-framework/",
-      "statusCode": 301
-    },
-    {
-      "source": "/demo-node",
-      "destination": "/demo-node/",
-      "statusCode": 301
-    }
-  ]
+  }
 }
