@@ -110,11 +110,11 @@ function getTestPageHTML() {
                 <button class="btn btn-red" onclick="runSleep(15, 'sleep-15')">▶ 运行</button>
                 <span class="status status-pending" id="st-sleep-15">待测试</span>
             </div>
-            <div class="result-box" id="res-sleep-8"></div>
+            <div class="result-box" id="res-sleep-15"></div>
             <div class="test-row">
-                <span class="label">Sleep 15s (应超时)</span>
-                <button class="btn btn-red" onclick="runSleep(15, 'sleep-15')">▶ 运行</button>
-                <span class="status status-pending" id="st-sleep-15">待测试</span>
+                <span class="label">Sleep 25s (应超时)</span>
+                <button class="btn btn-red" onclick="runSleep(25, 'sleep-25')">▶ 运行</button>
+                <span class="status status-pending" id="st-sleep-25">待测试</span>
             </div>
             <div class="result-box" id="res-sleep-25"></div>
         </div>

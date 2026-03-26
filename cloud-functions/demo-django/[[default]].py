@@ -9,16 +9,24 @@ from django.core.wsgi import get_wsgi_application
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import os
+import sys
 import json
 import time
 
 # Django 最小配置
+# 注意：通过 importlib 动态加载时，__name__ 可能是非法 Python 标识符（如含连字符或方括号），
+# 导致 Django 无法通过 import_module(ROOT_URLCONF) 找到 urlpatterns。
+# 解决方案：使用一个合法的固定模块名，并确保 sys.modules 中有对应条目。
+_MODULE_NAME = 'demo_django_app'
+sys.modules[_MODULE_NAME] = sys.modules[__name__]
+
 if not settings.configured:
     settings.configure(
         DEBUG=True,
         SECRET_KEY='django-insecure-demo-key-for-testing-only-' + str(time.time()),
-        ROOT_URLCONF=__name__,
+        ROOT_URLCONF=_MODULE_NAME,
         ALLOWED_HOSTS=['*'],
+        APPEND_SLASH=False,  # 禁用自动追加斜杠，避免运行时去掉尾部斜杠后导致无限重定向
         MIDDLEWARE=[
             'django.middleware.common.CommonMiddleware',
         ],
@@ -349,50 +357,55 @@ def test_methods(request):
 
 
 # ============ URL 路由配置 ============
+# 注意：运行时在路由匹配前会去掉请求路径的尾部斜杠，
+# 所以 Django urlpatterns 也不带尾部斜杠（已禁用 APPEND_SLASH）。
+# 使用 re_path 支持可选尾部斜杠，兼容两种情况。
+from django.urls import re_path
+
 urlpatterns = [
     # 基础路由
     path('', root, name='root'),
-    path('health/', health, name='health'),
+    re_path(r'^health/?$', health, name='health'),
     
     # RESTful API
-    path('users/<int:user_id>/', get_user, name='get_user'),
-    path('users/create/', create_user, name='create_user'),
-    path('users/<int:user_id>/update/', update_user, name='update_user'),
-    path('users/<int:user_id>/delete/', delete_user, name='delete_user'),
+    re_path(r'^users/(?P<user_id>\d+)/?$', get_user, name='get_user'),
+    re_path(r'^users/create/?$', create_user, name='create_user'),
+    re_path(r'^users/(?P<user_id>\d+)/update/?$', update_user, name='update_user'),
+    re_path(r'^users/(?P<user_id>\d+)/delete/?$', delete_user, name='delete_user'),
     
     # 查询和搜索
-    path('search/', search, name='search'),
+    re_path(r'^search/?$', search, name='search'),
     
     # 流式响应
-    path('stream/', stream_sse, name='stream_sse'),
-    path('stream/json/', stream_json, name='stream_json'),
-    path('stream/large/', stream_large, name='stream_large'),
+    re_path(r'^stream/?$', stream_sse, name='stream_sse'),
+    re_path(r'^stream/json/?$', stream_json, name='stream_json'),
+    re_path(r'^stream/large/?$', stream_large, name='stream_large'),
     
     # 文件上传
-    path('upload/', upload_file, name='upload_file'),
-    path('upload/multiple/', upload_multiple, name='upload_multiple'),
+    re_path(r'^upload/?$', upload_file, name='upload_file'),
+    re_path(r'^upload/multiple/?$', upload_multiple, name='upload_multiple'),
     
     # 请求头
-    path('headers/echo/', echo_headers, name='echo_headers'),
-    path('headers/custom/', custom_headers, name='custom_headers'),
+    re_path(r'^headers/echo/?$', echo_headers, name='echo_headers'),
+    re_path(r'^headers/custom/?$', custom_headers, name='custom_headers'),
     
     # Cookie
-    path('cookie/set/', set_cookie, name='set_cookie'),
-    path('cookie/get/', get_cookie, name='get_cookie'),
+    re_path(r'^cookie/set/?$', set_cookie, name='set_cookie'),
+    re_path(r'^cookie/get/?$', get_cookie, name='get_cookie'),
     
     # 表单数据
-    path('form/', form_data, name='form_data'),
+    re_path(r'^form/?$', form_data, name='form_data'),
     
     # JSON 响应
-    path('json/variants/', json_response_variants, name='json_variants'),
+    re_path(r'^json/variants/?$', json_response_variants, name='json_variants'),
     
     # 性能测试
-    path('performance/compute/<int:n>/', performance_test, name='performance_test'),
+    re_path(r'^performance/compute/(?P<n>\d+)/?$', performance_test, name='performance_test'),
     
     # HTTP 方法测试
-    path('methods/test/', test_methods, name='test_methods'),
+    re_path(r'^methods/test/?$', test_methods, name='test_methods'),
 ]
 
 # WSGI 应用
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', __name__)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', _MODULE_NAME)
 app = get_wsgi_application()
