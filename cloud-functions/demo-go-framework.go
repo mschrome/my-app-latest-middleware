@@ -312,7 +312,10 @@ func testPageHTML() string {
             { id: 8, name: "请求头", method: "GET", path: basePath + "/headers", desc: "查看请求头信息", check: "user_agent" },
             { id: 9, name: "当前时间", method: "GET", path: basePath + "/time", desc: "获取服务端时间", check: "timestamp" },
             { id: 10, name: "JSON 处理", method: "POST", path: basePath + "/json", desc: "处理 JSON 请求体", body: {name: "test", value: 42}, check: "received" },
-            { id: 11, name: "错误处理", method: "GET", path: basePath + "/error", desc: "触发错误", expectError: true }
+            { id: 11, name: "错误处理", method: "GET", path: basePath + "/error", desc: "触发错误", expectError: true },
+            { id: 12, name: "Sleep 5s (应通过)", method: "GET", path: basePath + "/sleep?seconds=5", desc: "maxDuration=30s, sleep 5s 应正常返回", check: "Slept" },
+            { id: 13, name: "Sleep 25s (应通过)", method: "GET", path: basePath + "/sleep?seconds=25", desc: "maxDuration=30s, sleep 25s 应正常返回", check: "Slept" },
+            { id: 14, name: "Sleep 35s (应超时)", method: "GET", path: basePath + "/sleep?seconds=35", desc: "maxDuration=30s, sleep 35s 应被终止", expectError: true }
         ];
 
         var stats = { total: tests.length, passed: 0, failed: 0 };
