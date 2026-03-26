@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -177,22 +176,36 @@ func main() {
 		})
 	})
 
-	// CLI 不会剥离文件名前缀，传给 Go 的路径是完整的
-	// 例如 /demo-go-framework/info、/demo-go-framework/ 等
-	// 需要在请求进入 Gin 之前手动剥离前缀，使 Gin 路由能匹配
-	const prefix = "/demo-go-framework"
-	fmt.Println("Go framework function listening on :9000")
-	http.ListenAndServe(":9000", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		path := req.URL.Path
-		if strings.HasPrefix(path, prefix) {
-			path = path[len(prefix):]
-			if path == "" {
-				path = "/"
+	// maxDuration 超时测试 (edgeone.json: go.maxDuration = 30s)
+	r.GET("/sleep", func(c *gin.Context) {
+		secondsStr := c.Query("seconds")
+		seconds := 5
+		if secondsStr != "" {
+			if parsed, err := strconv.Atoi(secondsStr); err == nil && parsed > 0 {
+				seconds = parsed
 			}
-			req.URL.Path = path
 		}
-		r.ServeHTTP(w, req)
-	}))
+		if seconds > 120 {
+			seconds = 120
+		}
+
+		fmt.Printf("[SLEEP] Starting sleep for %d seconds...\n", seconds)
+		startTime := time.Now()
+		time.Sleep(time.Duration(seconds) * time.Second)
+		elapsed := time.Since(startTime).Seconds()
+		fmt.Printf("[SLEEP] Woke up after %.2f seconds\n", elapsed)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message":        fmt.Sprintf("Slept for %d seconds", seconds),
+			"requested_sleep": seconds,
+			"actual_elapsed":  fmt.Sprintf("%.2fs", elapsed),
+			"max_duration":    "30s (configured in edgeone.json)",
+			"within_limit":    seconds <= 30,
+		})
+	})
+
+	// Framework 模式：平台会自动剥离文件名前缀再转发给框架
+	r.Run(":9000")
 }
 
 // 回显处理

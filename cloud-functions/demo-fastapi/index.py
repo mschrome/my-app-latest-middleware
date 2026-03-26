@@ -132,7 +132,10 @@ async def root():
             { id: 13, name: "自定义响应", method: "GET", path: basePath + "/response/custom", desc: "自定义响应模型", check: "user_id" },
             { id: 14, name: "状态码测试", method: "GET", path: basePath + "/response/status", desc: "HTTP 状态码", check: "Created successfully" },
             { id: 15, name: "请求头回显", method: "GET", path: basePath + "/headers/echo", desc: "回显请求头", check: "user_agent" },
-            { id: 16, name: "性能测试", method: "GET", path: basePath + "/performance/compute/1000", desc: "计算性能测试", check: "result" }
+            { id: 16, name: "性能测试", method: "GET", path: basePath + "/performance/compute/1000", desc: "计算性能测试", check: "result" },
+            { id: 17, name: "Sleep 5s (应通过)", method: "GET", path: basePath + "/sleep?seconds=5", desc: "maxDuration=20s, sleep 5s 应正常返回", check: "Slept" },
+            { id: 18, name: "Sleep 15s (应通过)", method: "GET", path: basePath + "/sleep?seconds=15", desc: "maxDuration=20s, sleep 15s 应正常返回", check: "Slept" },
+            { id: 19, name: "Sleep 25s (应超时)", method: "GET", path: basePath + "/sleep?seconds=25", desc: "maxDuration=20s, sleep 25s 应被终止", expectError: true }
         ];
 
         let stats = { total: tests.length, passed: 0, failed: 0 };
@@ -500,4 +503,21 @@ async def performance_test(n: int = Path(..., ge=1, le=1000000)):
         "result": result,
         "duration_seconds": duration,
         "operations_per_second": n / duration if duration > 0 else 0
+    }
+
+
+# ============ 11. maxDuration 超时测试 ============
+@app.get("/sleep")
+async def sleep_test(seconds: int = Query(5, ge=1, le=120)):
+    """maxDuration 超时测试 (edgeone.json: python.maxDuration = 20s)"""
+    start = time.time()
+    await asyncio.sleep(seconds)
+    elapsed = time.time() - start
+    
+    return {
+        "message": f"Slept for {seconds} seconds",
+        "requested_sleep": seconds,
+        "actual_elapsed": f"{elapsed:.2f}s",
+        "max_duration": "20s (configured in edgeone.json)",
+        "within_limit": seconds <= 20
     }

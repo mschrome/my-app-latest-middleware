@@ -115,7 +115,10 @@ def root():
             { id: 14, name: "读取 Cookie", method: "GET", path: basePath + "/cookie/get", desc: "读取 Cookie", check: "cookies" },
             { id: 15, name: "错误处理", method: "GET", path: basePath + "/error/test", desc: "测试错误处理", expectError: true },
             { id: 16, name: "多方法测试", method: "POST", path: basePath + "/methods/test", desc: "测试不同 HTTP 方法", body: {test: "data"}, check: "method" },
-            { id: 17, name: "性能测试", method: "GET", path: basePath + "/performance/compute/1000", desc: "计算性能测试", check: "result" }
+            { id: 17, name: "性能测试", method: "GET", path: basePath + "/performance/compute/1000", desc: "计算性能测试", check: "result" },
+            { id: 18, name: "Sleep 5s (应通过)", method: "GET", path: basePath + "/sleep?seconds=5", desc: "maxDuration=20s, sleep 5s 应正常返回", check: "Slept" },
+            { id: 19, name: "Sleep 15s (应通过)", method: "GET", path: basePath + "/sleep?seconds=15", desc: "maxDuration=20s, sleep 15s 应正常返回", check: "Slept" },
+            { id: 20, name: "Sleep 25s (应超时)", method: "GET", path: basePath + "/sleep?seconds=25", desc: "maxDuration=20s, sleep 25s 应被终止", expectError: true }
         ];
 
         let stats = { total: tests.length, passed: 0, failed: 0 };
@@ -546,6 +549,29 @@ def performance_test(n):
         "result": result,
         "duration_seconds": duration,
         "operations_per_second": n / duration if duration > 0 else 0
+    })
+
+
+# ============ 11. maxDuration 超时测试 ============
+@app.route('/sleep')
+def sleep_test():
+    """maxDuration 超时测试 (edgeone.json: python.maxDuration = 20s)"""
+    seconds = int(request.args.get('seconds', 5))
+    if seconds < 1:
+        seconds = 1
+    if seconds > 120:
+        seconds = 120
+    
+    start = time.time()
+    time.sleep(seconds)
+    elapsed = time.time() - start
+    
+    return jsonify({
+        "message": f"Slept for {seconds} seconds",
+        "requested_sleep": seconds,
+        "actual_elapsed": f"{elapsed:.2f}s",
+        "max_duration": "20s (configured in edgeone.json)",
+        "within_limit": seconds <= 20
     })
 
 
