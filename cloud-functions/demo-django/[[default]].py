@@ -27,31 +27,13 @@ if not settings.configured:
 
 # ============ 1. 基础视图 ============
 def root(request):
-    """根路径 - 返回测试页面"""
-    from test_page_template import generate_test_page
-    
-    tests = [
-        {"id": 1, "name": "基础路由", "method": "GET", "path": "./", "desc": "获取 Django 框架信息", "check": "Django"},
-        {"id": 2, "name": "健康检查", "method": "GET", "path": "./health/", "desc": "服务健康状态", "check": "healthy"},
-        {"id": 3, "name": "获取用户", "method": "GET", "path": "./users/1/", "desc": "GET 用户信息", "check": "user_id"},
-        {"id": 4, "name": "创建用户", "method": "POST", "path": "./users/create/", "desc": "POST 创建用户", "body": {"username": "测试", "email": "test@example.com"}, "check": "User created"},
-        {"id": 5, "name": "更新用户", "method": "PUT", "path": "./users/1/update/", "desc": "PUT 更新用户", "body": {"username": "更新", "email": "update@example.com"}, "check": "updated"},
-        {"id": 6, "name": "删除用户", "method": "DELETE", "path": "./users/1/delete/", "desc": "DELETE 删除用户", "expectStatus": 204},
-        {"id": 7, "name": "搜索功能", "method": "GET", "path": "./search/?q=test&category=all", "desc": "搜索 API", "check": "query"},
-        {"id": 8, "name": "SSE 流", "method": "GET", "path": "./stream/", "desc": "Server-Sent Events", "stream": True},
-        {"id": 9, "name": "JSON 流", "method": "GET", "path": "./stream/json/", "desc": "JSON 流式传输", "stream": True},
-        {"id": 10, "name": "大数据流", "method": "GET", "path": "./stream/large/", "desc": "大数据流", "stream": True},
-        {"id": 11, "name": "请求头回显", "method": "GET", "path": "./headers/echo/", "desc": "回显请求头", "check": "user_agent"},
-        {"id": 12, "name": "自定义响应头", "method": "GET", "path": "./headers/custom/", "desc": "设置自定义头", "check": "custom headers"},
-        {"id": 13, "name": "设置 Cookie", "method": "GET", "path": "./cookie/set/", "desc": "设置 Cookie", "check": "Cookie set"},
-        {"id": 14, "name": "读取 Cookie", "method": "GET", "path": "./cookie/get/", "desc": "读取 Cookie", "check": "cookie"},
-        {"id": 15, "name": "方法测试", "method": "POST", "path": "./methods/test/", "desc": "HTTP 方法", "body": {"test": "data"}, "check": "method"},
-        {"id": 16, "name": "JSON 变体", "method": "GET", "path": "./json/variants/", "desc": "不同 JSON 响应", "check": "standard"},
-        {"id": 17, "name": "性能测试", "method": "GET", "path": "./performance/compute/1000/", "desc": "计算性能", "check": "result"}
-    ]
-    
-    html = generate_test_page("Django", "#4caf50, #2196f3", tests)
-    return HttpResponse(html)
+    """根路径 - API 信息"""
+    return JsonResponse({
+        "name": "Django Demo",
+        "framework": "Django",
+        "version": "4.0+",
+        "routes": ["/health/", "/users/<id>/", "/search/", "/stream/", "/performance/compute/<n>/"]
+    })
 
 
 def health(request):

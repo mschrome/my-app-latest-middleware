@@ -120,25 +120,12 @@ def _html_response(status_code, html_content):
 # ============ 路由处理函数 ============
 
 def handle_root(method, path, query, headers, body):
-    """根路径 - 返回测试页面"""
-    from test_page_template import generate_test_page
-
-    tests = [
-        {"id": 1, "name": "基础信息", "method": "GET", "path": "./info", "desc": "获取函数基本信息", "check": "Plain Python"},
-        {"id": 2, "name": "健康检查", "method": "GET", "path": "./health", "desc": "服务健康状态", "check": "healthy"},
-        {"id": 3, "name": "获取用户", "method": "GET", "path": "./users/1", "desc": "GET 用户信息", "check": "user_id"},
-        {"id": 4, "name": "创建用户", "method": "POST", "path": "./users", "desc": "POST 创建用户", "body": {"username": "测试", "email": "test@example.com"}, "check": "created"},
-        {"id": 5, "name": "搜索功能", "method": "GET", "path": "./search?q=test&limit=5", "desc": "查询参数搜索", "check": "query"},
-        {"id": 6, "name": "GET 回显", "method": "GET", "path": "./echo?msg=hello", "desc": "回显请求信息", "check": "method"},
-        {"id": 7, "name": "POST 回显", "method": "POST", "path": "./echo", "desc": "回显 POST 请求", "body": {"data": "test"}, "check": "method"},
-        {"id": 8, "name": "请求头", "method": "GET", "path": "./headers", "desc": "查看请求头信息", "check": "user_agent"},
-        {"id": 9, "name": "当前时间", "method": "GET", "path": "./time", "desc": "获取服务端时间", "check": "timestamp"},
-        {"id": 10, "name": "JSON 处理", "method": "POST", "path": "./json", "desc": "处理 JSON 请求体", "body": {"name": "test", "value": 42}, "check": "received"},
-        {"id": 11, "name": "错误处理", "method": "GET", "path": "./error", "desc": "触发错误", "expectError": True},
-    ]
-
-    html_content = generate_test_page("Python 函数", "#306998, #FFD43B", tests)
-    return _html_response(200, html_content)
+    """根路径 - API 信息"""
+    return _response(200, {
+        "name": "Plain Python Function Demo",
+        "framework": "None (Plain Python)",
+        "routes": ["/info", "/health", "/users/<id>", "/search", "/echo", "/time", "/headers", "/json", "/error"]
+    })
 
 
 def handle_health(method, path, query, headers, body):

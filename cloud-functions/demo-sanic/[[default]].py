@@ -9,38 +9,18 @@ import asyncio
 import time
 
 app = Sanic("sanic_demo")
+app.config.TOUCHUP = False  # 禁用 TouchUp 优化，避免 EdgeOne 环境下 'handle_exception' KeyError
 
 
 # ============ 1. 基础路由 ============
 @app.route("/")
 async def root(request: Request):
-    """根路径 - 返回测试页面"""
-    from test_page_template import generate_test_page
-    from sanic.response import html
-    
-    tests = [
-        {"id": 1, "name": "基础路由", "method": "GET", "path": "./", "desc": "获取 Sanic 框架信息", "check": "Sanic"},
-        {"id": 2, "name": "健康检查", "method": "GET", "path": "./health", "desc": "服务健康状态", "check": "healthy"},
-        {"id": 3, "name": "获取用户", "method": "GET", "path": "./users/1", "desc": "GET 用户信息", "check": "user_id"},
-        {"id": 4, "name": "创建用户", "method": "POST", "path": "./users", "desc": "POST 创建用户", "body": {"username": "测试", "email": "test@example.com"}, "check": "User created"},
-        {"id": 5, "name": "更新用户", "method": "PUT", "path": "./users/1", "desc": "PUT 更新用户", "body": {"username": "更新", "email": "update@example.com"}, "check": "updated"},
-        {"id": 6, "name": "删除用户", "method": "DELETE", "path": "./users/1", "desc": "DELETE 删除用户", "expectStatus": 204},
-        {"id": 7, "name": "搜索功能", "method": "GET", "path": "./search?q=test&category=all", "desc": "搜索 API", "check": "query"},
-        {"id": 8, "name": "流式响应", "method": "GET", "path": "./stream", "desc": "Server-Sent Events", "stream": True},
-        {"id": 9, "name": "JSON 流", "method": "GET", "path": "./stream/json", "desc": "JSON 流式传输", "stream": True},
-        {"id": 10, "name": "大数据流", "method": "GET", "path": "./stream/large", "desc": "大数据流", "stream": True},
-        {"id": 11, "name": "异步延迟", "method": "GET", "path": "./async/delay/1", "desc": "异步延迟操作", "check": "actual_duration"},
-        {"id": 12, "name": "并行任务", "method": "GET", "path": "./async/parallel", "desc": "并行异步任务", "check": "tasks"},
-        {"id": 13, "name": "数据库模拟", "method": "GET", "path": "./async/database", "desc": "模拟数据库查询", "check": "user"},
-        {"id": 14, "name": "请求头回显", "method": "GET", "path": "./headers/echo", "desc": "回显请求头", "check": "user_agent"},
-        {"id": 15, "name": "自定义响应头", "method": "GET", "path": "./headers/custom", "desc": "设置自定义头", "check": "custom headers"},
-        {"id": 16, "name": "设置 Cookie", "method": "GET", "path": "./cookie/set", "desc": "设置 Cookie", "check": "Cookie set"},
-        {"id": 17, "name": "读取 Cookie", "method": "GET", "path": "./cookie/get", "desc": "读取 Cookie", "check": "cookie"},
-        {"id": 18, "name": "错误处理", "method": "GET", "path": "./error/test", "desc": "500 错误", "expectError": True}
-    ]
-    
-    html_content = generate_test_page("Sanic", "#ff6b6b, #4ecdc4", tests)
-    return html(html_content)
+    """根路径 - API 信息"""
+    return json({
+        "name": "Sanic Demo",
+        "framework": "Sanic",
+        "routes": ["/health", "/users/<id>", "/search", "/stream", "/async/delay/<s>"]
+    })
 
 
 @app.route("/health")
