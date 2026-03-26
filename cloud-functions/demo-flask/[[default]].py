@@ -555,7 +555,7 @@ def performance_test(n):
 # ============ 11. maxDuration 超时测试 ============
 @app.route('/sleep')
 def sleep_test():
-    """maxDuration 超时测试 (edgeone.json: python.maxDuration = 20s)"""
+    """maxDuration 超时测试 (edgeone.json: python.maxDuration = 8s)"""
     seconds = int(request.args.get('seconds', 5))
     if seconds < 1:
         seconds = 1
@@ -570,8 +570,8 @@ def sleep_test():
         "message": f"Slept for {seconds} seconds",
         "requested_sleep": seconds,
         "actual_elapsed": f"{elapsed:.2f}s",
-        "max_duration": "20s (configured in edgeone.json)",
-        "within_limit": seconds <= 20
+        "max_duration": "8s (configured in edgeone.json)",
+        "within_limit": seconds <= 8
     })
 
 

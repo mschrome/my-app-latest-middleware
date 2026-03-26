@@ -68,8 +68,8 @@ export default async function onRequest(context) {
         message: `Slept for ${seconds} seconds`,
         requested_sleep: seconds,
         actual_elapsed: `${elapsed}s`,
-        max_duration: '10s (configured in edgeone.json)',
-        within_limit: seconds <= 10,
+        max_duration: '5s (configured in edgeone.json)',
+        within_limit: seconds <= 5,
       });
     }
 

@@ -65,8 +65,8 @@ function getTestPageHTML() {
         </div>
 
         <div class="config-info">
-            ⚙️ 当前配置: <strong>nodejs.maxDuration = 10 秒</strong>
-            <br>预期: sleep ≤ 10s 应正常返回，sleep > 10s 应被强制终止/超时
+            ⚙️ 当前配置: <strong>nodejs.maxDuration = 5 秒</strong>
+            <br>预期: sleep ≤ 5s 应正常返回，sleep > 5s 应被强制终止/超时
         </div>
 
         <div class="test-section">
@@ -110,11 +110,11 @@ function getTestPageHTML() {
                 <button class="btn btn-red" onclick="runSleep(15, 'sleep-15')">▶ 运行</button>
                 <span class="status status-pending" id="st-sleep-15">待测试</span>
             </div>
-            <div class="result-box" id="res-sleep-15"></div>
+            <div class="result-box" id="res-sleep-8"></div>
             <div class="test-row">
-                <span class="label">Sleep 25s (应超时)</span>
-                <button class="btn btn-red" onclick="runSleep(25, 'sleep-25')">▶ 运行</button>
-                <span class="status status-pending" id="st-sleep-25">待测试</span>
+                <span class="label">Sleep 15s (应超时)</span>
+                <button class="btn btn-red" onclick="runSleep(15, 'sleep-15')">▶ 运行</button>
+                <span class="status status-pending" id="st-sleep-15">待测试</span>
             </div>
             <div class="result-box" id="res-sleep-25"></div>
         </div>
@@ -178,7 +178,7 @@ function getTestPageHTML() {
                 } else if (!r.ok && seconds > 10) {
                     stEl.className = 'status status-timeout';
                     stEl.textContent = '⏰ 被终止 (' + (elapsed/1000).toFixed(1) + 's) HTTP ' + r.status;
-                } else if (r.ok && seconds > 10) {
+                } else if (r.ok && seconds > 5) {
                     stEl.className = 'status status-error';
                     stEl.textContent = '⚠️ 未超时! (' + (elapsed/1000).toFixed(1) + 's) - maxDuration 未生效';
                 } else {

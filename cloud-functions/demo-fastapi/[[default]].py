@@ -133,9 +133,9 @@ async def root():
             { id: 14, name: "状态码测试", method: "GET", path: basePath + "/response/status", desc: "HTTP 状态码", check: "Created successfully" },
             { id: 15, name: "请求头回显", method: "GET", path: basePath + "/headers/echo", desc: "回显请求头", check: "user_agent" },
             { id: 16, name: "性能测试", method: "GET", path: basePath + "/performance/compute/1000", desc: "计算性能测试", check: "result" },
-            { id: 17, name: "Sleep 5s (应通过)", method: "GET", path: basePath + "/sleep?seconds=5", desc: "maxDuration=20s, sleep 5s 应正常返回", check: "Slept" },
-            { id: 18, name: "Sleep 15s (应通过)", method: "GET", path: basePath + "/sleep?seconds=15", desc: "maxDuration=20s, sleep 15s 应正常返回", check: "Slept" },
-            { id: 19, name: "Sleep 25s (应超时)", method: "GET", path: basePath + "/sleep?seconds=25", desc: "maxDuration=20s, sleep 25s 应被终止", expectError: true }
+            { id: 17, name: "Sleep 3s (应通过)", method: "GET", path: basePath + "/sleep?seconds=3", desc: "maxDuration=8s, sleep 3s 应正常返回", check: "Slept" },
+            { id: 18, name: "Sleep 6s (应通过)", method: "GET", path: basePath + "/sleep?seconds=6", desc: "maxDuration=8s, sleep 6s 应正常返回", check: "Slept" },
+            { id: 19, name: "Sleep 12s (应超时)", method: "GET", path: basePath + "/sleep?seconds=12", desc: "maxDuration=8s, sleep 12s 应被终止", expectError: true }
         ];
 
         let stats = { total: tests.length, passed: 0, failed: 0 };
