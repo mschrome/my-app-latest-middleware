@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -168,35 +167,6 @@ func main() {
 		})
 	})
 
-	// 超时测试 - 用于验证 maxDuration 配置
-	// 访问 /sleep?seconds=25 可以正常返回（Go maxDuration=30）
-	// 访问 /sleep?seconds=35 应该被强制终止（超过30秒限制）
-	r.GET("/sleep", func(c *gin.Context) {
-		seconds := 5
-		if s := c.Query("seconds"); s != "" {
-			if parsed, err := strconv.Atoi(s); err == nil && parsed > 0 && parsed <= 120 {
-				seconds = parsed
-			}
-		}
-		c.Writer.Header().Set("Content-Type", "application/json")
-		c.Writer.WriteHeader(http.StatusOK)
-		c.Writer.Flush()
-
-		startTime := time.Now()
-		fmt.Printf("[SLEEP] Starting sleep for %d seconds...\n", seconds)
-		time.Sleep(time.Duration(seconds) * time.Second)
-		elapsed := time.Since(startTime).Seconds()
-		fmt.Printf("[SLEEP] Woke up after %.2f seconds\n", elapsed)
-
-		c.JSON(http.StatusOK, gin.H{
-			"message":          fmt.Sprintf("Slept for %d seconds", seconds),
-			"requested_sleep":  seconds,
-			"actual_elapsed":   fmt.Sprintf("%.2fs", elapsed),
-			"max_duration":     "30s (configured in edgeone.json)",
-			"within_limit":     seconds <= 30,
-		})
-	})
-
 	// 错误处理测试
 	r.GET("/error", func(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -206,22 +176,36 @@ func main() {
 		})
 	})
 
-	// CLI 不会剥离文件名前缀，传给 Go 的路径是完整的
-	// 例如 /demo-go-framework/info、/demo-go-framework/ 等
-	// 需要在请求进入 Gin 之前手动剥离前缀，使 Gin 路由能匹配
-	const prefix = "/demo-go-framework"
-	fmt.Println("Go framework function listening on :9000")
-	http.ListenAndServe(":9000", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		path := req.URL.Path
-		if strings.HasPrefix(path, prefix) {
-			path = path[len(prefix):]
-			if path == "" {
-				path = "/"
+	// maxDuration 超时测试 (edgeone.json: go.maxDuration = 30s)
+	r.GET("/sleep", func(c *gin.Context) {
+		secondsStr := c.Query("seconds")
+		seconds := 5
+		if secondsStr != "" {
+			if parsed, err := strconv.Atoi(secondsStr); err == nil && parsed > 0 {
+				seconds = parsed
 			}
-			req.URL.Path = path
 		}
-		r.ServeHTTP(w, req)
-	}))
+		if seconds > 120 {
+			seconds = 120
+		}
+
+		fmt.Printf("[SLEEP] Starting sleep for %d seconds...\n", seconds)
+		startTime := time.Now()
+		time.Sleep(time.Duration(seconds) * time.Second)
+		elapsed := time.Since(startTime).Seconds()
+		fmt.Printf("[SLEEP] Woke up after %.2f seconds\n", elapsed)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message":        fmt.Sprintf("Slept for %d seconds", seconds),
+			"requested_sleep": seconds,
+			"actual_elapsed":  fmt.Sprintf("%.2fs", elapsed),
+			"max_duration":    "30s (configured in edgeone.json)",
+			"within_limit":    seconds <= 30,
+		})
+	})
+
+	// Framework 模式：平台会自动剥离文件名前缀再转发给框架
+	r.Run(":9000")
 }
 
 // 回显处理
@@ -341,7 +325,10 @@ func testPageHTML() string {
             { id: 8, name: "请求头", method: "GET", path: basePath + "/headers", desc: "查看请求头信息", check: "user_agent" },
             { id: 9, name: "当前时间", method: "GET", path: basePath + "/time", desc: "获取服务端时间", check: "timestamp" },
             { id: 10, name: "JSON 处理", method: "POST", path: basePath + "/json", desc: "处理 JSON 请求体", body: {name: "test", value: 42}, check: "received" },
-            { id: 11, name: "错误处理", method: "GET", path: basePath + "/error", desc: "触发错误", expectError: true }
+            { id: 11, name: "错误处理", method: "GET", path: basePath + "/error", desc: "触发错误", expectError: true },
+            { id: 12, name: "Sleep 5s (应通过)", method: "GET", path: basePath + "/sleep?seconds=5", desc: "maxDuration=30s, sleep 5s 应正常返回", check: "Slept" },
+            { id: 13, name: "Sleep 25s (应通过)", method: "GET", path: basePath + "/sleep?seconds=25", desc: "maxDuration=30s, sleep 25s 应正常返回", check: "Slept" },
+            { id: 14, name: "Sleep 35s (应超时)", method: "GET", path: basePath + "/sleep?seconds=35", desc: "maxDuration=30s, sleep 35s 应被终止", expectError: true }
         ];
 
         var stats = { total: tests.length, passed: 0, failed: 0 };
