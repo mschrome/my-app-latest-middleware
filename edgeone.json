@@ -1,7 +1,7 @@
 {
   "cloudFunctions": {
     "nodejs": {
-      "maxDuration": 5
+      "maxDuration": 10
     },
     "python": {
       "maxDuration": 8
