@@ -1,2 +1,0 @@
-# No external dependencies required
-# demo-plain uses only Python standard library (BaseHTTPRequestHandler)
