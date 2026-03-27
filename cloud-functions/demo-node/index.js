@@ -61,11 +61,11 @@ function getTestPageHTML() {
     <div class="container">
         <div class="header">
             <h1>🟢 Node.js 云函数 - maxDuration 测试</h1>
-            <div class="subtitle">验证 edgeone.json 中 nodejs.maxDuration = 10 秒的配置</div>
+            <div class="subtitle">验证 edgeone.json 中 nodejs.maxDuration = 5 秒的配置</div>
         </div>
 
         <div class="config-info">
-            ⚙️ 当前配置: <strong>nodejs.maxDuration = 5 秒</strong>
+            ⚙️ 当前配置: <strong>nodeFunctionsConfig.maxDuration = 5 秒</strong>
             <br>预期: sleep ≤ 5s 应正常返回，sleep > 5s 应被强制终止/超时
         </div>
 
@@ -100,8 +100,8 @@ function getTestPageHTML() {
             </div>
             <div class="result-box" id="res-sleep-3"></div>
             <div class="test-row">
-                <span class="label">Sleep 8s (应通过)</span>
-                <button class="btn btn-orange" onclick="runSleep(8, 'sleep-8')">▶ 运行</button>
+                <span class="label">Sleep 8s (应超时)</span>
+                <button class="btn btn-red" onclick="runSleep(8, 'sleep-8')">▶ 运行</button>
                 <span class="status status-pending" id="st-sleep-8">待测试</span>
             </div>
             <div class="result-box" id="res-sleep-8"></div>
@@ -172,10 +172,10 @@ function getTestPageHTML() {
                 var text = await r.text();
                 try { text = JSON.stringify(JSON.parse(text), null, 2); } catch(e) {}
 
-                if (r.ok && seconds <= 10) {
+                if (r.ok && seconds <= 5) {
                     stEl.className = 'status status-success';
                     stEl.textContent = '✅ 正常返回 (' + (elapsed/1000).toFixed(1) + 's)';
-                } else if (!r.ok && seconds > 10) {
+                } else if (!r.ok && seconds > 5) {
                     stEl.className = 'status status-timeout';
                     stEl.textContent = '⏰ 被终止 (' + (elapsed/1000).toFixed(1) + 's) HTTP ' + r.status;
                 } else if (r.ok && seconds > 5) {
@@ -189,7 +189,7 @@ function getTestPageHTML() {
                 resEl.style.display = 'block';
             } catch(e) {
                 var elapsed = Date.now() - start;
-                if (seconds > 10) {
+                if (seconds > 5) {
                     stEl.className = 'status status-timeout';
                     stEl.textContent = '⏰ 连接中断 (' + (elapsed/1000).toFixed(1) + 's) - 可能被 maxDuration 终止';
                 } else {

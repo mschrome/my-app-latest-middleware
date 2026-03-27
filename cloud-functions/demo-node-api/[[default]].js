@@ -21,7 +21,7 @@ export default async function onRequest(context) {
         name: 'Node.js Cloud Function API',
         runtime: 'Node.js',
         description: '用于测试 maxDuration 配置的 Node.js 云函数',
-        maxDuration: '10s (configured in edgeone.json)',
+        maxDuration: '5s (configured in edgeone.json)',
         routes: ['/info', '/health', '/time', '/sleep?seconds=N'],
       });
 
@@ -30,7 +30,7 @@ export default async function onRequest(context) {
         name: 'Node.js Cloud Function Demo',
         runtime: 'Node.js',
         description: '用于测试 maxDuration 配置的 Node.js 云函数',
-        maxDuration: '10s (configured in edgeone.json)',
+        maxDuration: '5s (configured in edgeone.json)',
       });
 
     case '/health':
