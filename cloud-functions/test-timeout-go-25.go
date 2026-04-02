@@ -19,7 +19,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("[GO-SLEEP] Woke up after %.2f seconds\n", elapsed)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json"
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"message":         fmt.Sprintf("Go function slept for %d seconds", sleepSeconds),
 		"requested_sleep": sleepSeconds,
