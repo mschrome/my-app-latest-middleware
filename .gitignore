@@ -62,4 +62,10 @@ __pycache__/
 # Lock files (optional)
 deno.lock
 uv.lock
-  
+
+.agents/
+.claude/
+.codebuddy/
+.kiro/
+skills/
+skills-lock.json
